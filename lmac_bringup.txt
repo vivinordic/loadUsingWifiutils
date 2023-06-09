@@ -1,0 +1,13 @@
+wifiutils write_wrd 0x0050 0x3C1A8000;
+wifiutils write_wrd 0x0054 0x275A0000;
+wifiutils write_wrd 0x0058 0x03400008;
+wifiutils write_wrd 0x005c 0x00000000;
+wifiutils write_wrd 0x0000 0x1;
+wifiutils read_wrd 0x80d50
+wifiutils write_wrd 0x0150 0x3C1A8000;
+wifiutils write_wrd 0x0154 0x275A0000;
+wifiutils write_wrd 0x0158 0x03400008;
+wifiutils write_wrd 0x015c 0x00000000;
+wifiutils write_wrd 0x0100 0x1;
+wifiutils read_wrd 0xc0000
+wifiutils read_wrd 0x91000

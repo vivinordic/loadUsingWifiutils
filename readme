@@ -1,0 +1,33 @@
+####### Readme #########
+
+Date updated :- 31 Jan 2022
+
+The following folder contains the scripts to run the LMAC TB on SIM/FPGA
+The python script : 1.Loads the the firmware image 
+					2.prepares and sends the commands to firware 
+					3.Prepaers the test cases as per the inputs from Excel sheet
+
+The lmac_tb code needs to be compiled only once. The command is the following: 
+																				make -f Makefile.mak  | grep "error"
+					
+The command to compile crypto module is : 
+										sudo gcc -v -shared -Wall -I/usr/include/python2.7 -lpython2.7 -o cryptoTb.so -fPIC *.c *.h 2>&1 | grep "error"
+
+Edit the testPlan1.0.xls file - Initialization Params sheet to provide the required elf, sim/emu/fpga number
+
+The python code main file starts from automation.py 
+
+Python code compilation is : 
+							python automation.py
+							
+							
+Detailed steps to run: 
+	1. Take copy from p4
+	2. Compile LMAC firmware (as usual)
+	3. Check if relative path is correct in excel sheet
+	4. Point the sheet to run in excel sheet (its set to "All") 
+	5. Cd to test/lmac/automation/lmacScripts
+	6. Cd to lmac_tb 
+	7. run - make -f Makefile.mak  | grep "error"
+	8. the "cd .."  to lmac/automation/lmacScripts
+	9. run "python automation.py"

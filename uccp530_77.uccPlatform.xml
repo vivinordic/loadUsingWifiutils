@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uccPlatform xmlns="http://ch.imgtec.org/uccTools/uccPlatform-1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://ch.imgtec.org/uccTools/uccPlatform-1 ../uccPlatform.xsd"
+    version="0" name="530_77" numUccs="1">
+
+    <!-- Core version -->
+    <!-- This is the -1 aggregate of 53 part of 530 -->
+    <coreVersion configurationId="77" revision="4.2.1" />
+
+    <!-- Host processor -->
+    <hostProcessor name="MIPS" variant="UAPTIVUC" />
+
+    <cores>
+        <core name="MCU" identity="0" aliases="lmac"/>
+        <core name="MCU2" identity="1" aliases="umac"/>
+    </cores>
+
+    <!-- Memory -->
+    <memory>
+        <globalRam size="0x6000" />
+
+        <!-- Using a stride of 2 ** 16 (words) when * 4 (bytes) = 262,144 (0x40000) -->
+
+        <!-- Size of 208 Kb (0x3_4000) -->
+        <MIPSCoreROM name="rom"  base="0x0"      size="0x34000" core="MCU" nblocks="1" blockSize="0x34000"/>
+        <!-- Size of 48 Kb (0x4_0000) -->
+        <MIPSCoreRAM name="ram_a" base="0x40000" size="0xC000"  core="MCU" nblocks="1" blockSize="0xC000" retained="True"/>
+        <!-- Size of 64 Kb (0x8_0000) -->
+        <MIPSCoreRAM name="ram_b" base="0x80000" size="0x10000" core="MCU" nblocks="1" blockSize="0x10000"/>
+
+        <!-- Using a stride of 2 ** 17 (words) when * 4 (bytes) = 524,288 (0x80000) -->
+
+        <!-- Size of 390 Kb (0x6_1800) -->
+        <MIPSCoreROM name="rom"  base="0x0"      size="0x61800" core="MCU2" nblocks="1" blockSize="0x61800"/>
+        <!-- Size of 144 Kb (0x2_4000) -->
+        <MIPSCoreRAM name="ram_a" base="0x80000" size="0x24000" core="MCU2" nblocks="1" blockSize="0x24000" retained="True"/>
+        <!-- Size of 224 Kb (0x3_8000) -->
+        <MIPSCoreRAM name="ram_b" base="0x100000" size="0x38000" core="MCU2" nblocks="1" blockSize="0x38000"/>
+
+    </memory>
+
+    <!-- Features -->
+    <feature name="EDC_HAS_HOLDOFF" value="false" />
+
+    <!-- OUTER_DECODER_T_MAX here indicates the max value of t that can be accommodated
+        in a single pass on the outer decoder hardware. This is not to be confused
+        with the RTL build option of the same name, as specified in the UCCP configurations
+        spreadsheet. The spreadsheet version of OUTER_DECODER_T_MAX details the maximum
+        value of t that can be accommodated in total (in 2 passes); hence the spreadsheet
+        value is twice the value here. -->
+
+    <feature name="MCP_SHADOW_REGISTERS" value="0"/>
+    <feature name="OUTER_DECODER_T_MAX" value="16" />
+    <feature name="SCP_HAS_MIXER_METRIC" value="true" />
+    <feature name="SCP_WIFI_ONLY" value="true"/>
+    <feature name="SCP_IW" value="12"/>
+    <feature name="SCP_FIR_VIRT_TAPS" value="24"/>
+    <feature name="VITERBI_STATES" value="64"/>
+    <feature name="VITERBI2_STATES" value="64"/>
+
+    <feature name="VITERBI_IN_FPGA" value="false"/>
+    <feature name="VITERBI_MAX_SD_WIDTH" value="4"/>
+    <feature name="MPU" value="false"/>
+    <feature name="RPU_LOGGING" value="true"/>
+    <feature name="VITERBI_ITERATIVE_FEC" value="false"/>
+    <!-- BUILD_VITERBI_TB_BLOCK_LEN -->
+    <feature name="VITERBI_TB_BLOCK_LEN" value="40"/>
+    <feature name="DFE_PHASE_TRACKER_LATENCY" value="false"/>
+    <feature name="WSM" value="false"/>
+    <feature name="SLEEP_CONTROLLER" value="true"/>
+    <feature name="MCU_COROUTINE" value="false"/>
+    <feature name="HPQM_SMALL_CONFIG" value="2"/>
+
+    <!-- UCC1 -->
+    <ucc id="1" name="530" numMcus="2" numEcus="0" numMcps="0" numScps="1" dcpIsa="4" mcpNvu="1" numViterbis="2"
+         numInterruptVectors="40" numHostports="4" mcpInterruptNums="8"
+         scpInterruptNums="9" hostportInterruptNums="10, 13, 14, 41" mcpIsa="520"
+         numEfsIrqs="2" efsInterruptNums="36, 27">
+
+        <addressRegions filename_suffix="ext_sys_bus" pdumpBlockDefine="INCLUDE_EXT_SYS_BUS_REGISTERS">
+
+            <!-- External System bus registers -->
+            <region key="REGFPGA_SYS" type="systemBus" offset="0x00002400" />
+            <region key="REGEXT_RAM_REC" type="systemBus" offset="0x00002420" />
+            <region key="REGSDRAM" type="systemBus" offset="0x00002440" />
+            <region key="REGPO_MEM_GENERIC" type="systemBus" offset="0x00002480" />
+            <region key="REGPO_MEM_GENERIC2" type="systemBus" offset="0x00002488" />
+            <region key="REGPO_MEM_GENERIC3" type="systemBus" offset="0x00002490" />
+            <region key="REGPO_MEM_GENERIC4" type="systemBus" offset="0x00002498" />
+            <region key="REGPO_MEM_GENERIC5" type="systemBus" offset="0x000024A0" />
+            <region key="REGPO_MEM_GENERIC6" type="systemBus" offset="0x000024A8" />
+            <region key="REGPO_MEM_GENERIC7" type="systemBus" offset="0x000024B0" />
+            <region key="REGPO_MEM_GENERIC8" type="systemBus" offset="0x000024B8" />
+            <region key="REGTSO_CAPS" type="systemBus" offset="0x000024C0" />
+            <region key="REGEXT_RAM_MEAS" type="systemBus" offset="0x00002500" />
+            <region key="REGADC_FIFO" type="systemBus" offset="0x00008B00" />
+            <region key="REGKUROI" type="systemBus" offset="0x00008BC0" />
+
+            <region key="REGWLANSYSTOP" type="extSystemBus" offset="0x00004800"/>
+            <region key="REGWLANSYSOTP" type="extSystemBus" offset="0x00004A00"/>
+            <region key="REGWLANSYSCOEX" type="extSystemBus" offset="0x00004B00"/>
+
+        </addressRegions>
+
+        <!-- Addresses of register blocks and memory blocks -->
+        <addressRegions>
+
+            <!-- System bus registers -->
+            <region key="REGSYSBUS" type="systemBus" offset="0x00000000" />
+            <region key="REGMIPSMCU" type="systemBus" offset="0x00000000" />
+            <region key="REGMIPSMCU2" type="systemBus" offset="0x00000040" />
+            <region key="REGMTXUCCP" type="systemBus" offset="0x000000C0" />
+            <region key="REGSYSREG" type="systemBus" offset="0x00000100" />
+            <region key="REGSOCFAB" type="systemBus" offset="0x00000180" />
+            <region key="REGLTCRFCTRL" type="systemBus" offset="0x00000280" />
+            <region key="REGIRQCTRL" type="systemBus" offset="0x00000800" />
+            <region key="REGSLEEPCTRL" type="systemBus" offset="0x00000B00" />
+            <region key="REGRPULOGREG" type="systemBus" offset="0x00000A80" />
+            <region key="REGEDCREG" type="systemBus" offset="0x00001800" />
+            <region key="REGEXTREG" type="systemBus" offset="0x00002400" />
+            <region key="REGTSCREG" type="systemBus" offset="0x000024C0" />
+            <region key="REG_SLVDBG" type="systemBus" offset="0x0000F000" />
+            <region key="REG_META_SD" type="systemBus" offset="0x0000F000" />
+            <region key="REGPMRREG" type="systemBus" offset="0x00400000" />
+            <region key="REGHPQMREG" type="systemBus" offset="0x40FA00" />
+
+            <!-- Peripheral bus registers -->
+            <region key="REGPMRSCP" name="PMR_SCP" type="peripheralBus"
+                offset="0x00000400" />
+            <region key="REGPMRWLANED" name="PMR_WLAN_ED" type="peripheralBus"
+                offset="0x00000E00" />
+            <region key="REGPMRWLANRADAR" name="PMR_WLAN_RADAR" type="peripheralBus"
+                offset="0x00000E80" />
+            <region key="REGPMRWLANAGC" name="PMR_WLAN_AGC" type="peripheralBus"
+                offset="0x00000F00" />
+            <region key="REGPMRWLANAGC2" name="PMR_WLAN_AGC2" type="peripheralBus"
+                offset="0x00000F80" />
+            <region key="REGPMRWLANAGC3" name="PMR_WLAN_AGC3" type="peripheralBus"
+                offset="0x00001000" />
+            <region key="REGPMRWLANAGC4" name="PMR_WLAN_AGC4" type="peripheralBus"
+                offset="0x00001080" />
+            <region key="REGPMRWLANED2" name="PMR_WLAN_ED2" type="peripheralBus"
+                offset="0x00001100" />
+            <region key="REGPMRRPUETS" name="PMR_RPU_ETS" type="peripheralBus"
+                offset="0x00001700" />
+            <region key="REGPMRSCPWO" name="PMR_SCP_WO" type="peripheralBus"
+                offset="0x00001E00" />
+            <region key="REGPMRWLANVIT" name="PMR_WLAN_VIT" type="peripheralBus"
+                offset="0x00002100" />
+            <region key="REGPMRWLANVIT2" name="PMR_WLAN_VIT2" type="peripheralBus"
+                offset="0x00002140" />
+            <region key="REGPMRACKGEN" name="PMR_WLAN_ACKGEN" type="peripheralBus"
+                offset="0x00002280" />
+            <region key="REGPMRRPUCLKRST" name="PMR_RPU_CLOCK_RESET" type="peripheralBus"
+                offset="0x00002300" />
+            <region key="REGPMRWLANDEAGG" name="PMR_WLAN_DEAGG" type="peripheralBus"
+                offset="0x00002600" />
+            <region key="REGPMRWLANMAC" name="PMR_WLAN_MAC" type="peripheralBus"
+                offset="0x00002680" />
+            <region key="REGPMRWLANFFT" name="PMR_WLAN_FFT" type="peripheralBus"
+                offset="0x00002700" />
+            <region key="REGPMRWLANTXP" name="PMR_WLAN_TXP" type="peripheralBus"
+                offset="0x00002800" />
+            <region key="REGPMRWLANTXP2" name="PMR_WLAN_TXP2" type="peripheralBus"
+                offset="0x00002900" />
+            <region key="REGPMRWLANTXC" name="PMR_WLAN_TXC" type="peripheralBus"
+                offset="0x00002A00" />
+            <region key="REGPMRWLANTXC2" name="PMR_WLAN_TXC2" type="peripheralBus"
+                offset="0x00002B00" />
+            <region key="REGPMRCRYPTO" name="PMR_CRYPTO" type="peripheralBus"
+                offset="0x00003000" />
+            <region key="REGPMRUCCFFT" name="PMR_UCC_FFT" type="peripheralBus"
+                offset="0x00003900" />
+            <region key="REGPMRUCCGRAM" name="PMR_UCC_GRAM" type="peripheralBus"
+                offset="0x00003A00" />
+            <region key="REGPMREDC" name="PMR_EDC" type="peripheralBus"
+                offset="0x00004C00" />
+            <region key="REGPMRUCCEFS" name="PMR_UCC_EFS" type="peripheralBus"
+                offset="0x00005000" />
+            <region key="REGPMRWLANAGG" name="PMR_WLAN_AGG" type="peripheralBus"
+                offset="0x00008000" />
+            <region key="REGPMRODSYND" name="PMR_OD_SYND" type="peripheralBus"
+                offset="0x00008600" />
+            <region key="REGPMRODLAM" name="PMR_OD_LAMBDA" type="peripheralBus"
+                offset="0x00008680" />
+            <region key="REGPMRODCHI" name="PMR_OD_CHIEN" type="peripheralBus"
+                offset="0x00008700" />
+            <region key="REGPMRODERR" name="PMR_OD_ERROR_MAGS" type="peripheralBus"
+                offset="0x00008780" />
+            <region key="REGPMROD2SYND" name="PMR_OD2_SYND" type="peripheralBus"
+                offset="0x00008800" />
+            <region key="REGPMROD2LAM" name="PMR_OD2_LAMBDA" type="peripheralBus"
+                offset="0x00008880" />
+            <region key="REGPMROD2CHI" name="PMR_OD2_CHIEN" type="peripheralBus"
+                offset="0x00008900" />
+            <region key="REGPMROD2ERR" name="PMR_OD2_ERROR_MAGS" type="peripheralBus"
+                offset="0x00008980" />
+            <region key="REGPMRWLANTMR" name="PMR_WLAN_TIMERS" type="peripheralBus"
+                offset="0x00008A00" />
+            <region key="REGPMRWLANDEPARS" name="PMR_WLAN_DEPARSER" type="peripheralBus"
+                offset="0x000008b00" />
+            <region key="REGPMRWLANDEPAR2" name="PMR_WLAN_DEPARSER2" type="peripheralBus"
+                offset="0x000008f00" />
+            <region key="REGPMRWLANRXP" name="PMR_WLAN_RXP" type="peripheralBus"
+                offset="0x000008b80" />
+            <region key="REGPMRWLANRXP11B" name="PMR_WLAN_RXP11B" type="peripheralBus"
+                offset="0x000008bc0" />
+            <region key="REGPMRWLANMIMO" name="PMR_WLAN_MIMO_DECODER"
+                type="peripheralBus" offset="0x000008c00" />
+            <region key="REGPMRWLANMIMO2" name="PMR_WLAN_MIMO_DECODER2"
+                type="peripheralBus" offset="0x000008c80" />
+            <region key="REGPMRWLANDECOMP" name="PMR_WLAN_LDPC_DECOMP"
+                type="peripheralBus" offset="0x00008e00" />
+            <region key="REGPMRWLANTMR2" name="PMR_WLAN_TIMERS2" type="peripheralBus"
+                offset="0x00009000" />
+            <region key="REGPMRWLANBDI" name="PMR_WLAN_BIT_DEINT" type="peripheralBus"
+                offset="0x00009200" />
+            <region key="REGPMRWLANBDI2" name="PMR_WLAN_BIT_DEINT2" type="peripheralBus"
+                offset="0x00009240" />
+            <region key="REGPMRWLANBDI3" name="PMR_WLAN_BIT_DEINT3" type="peripheralBus"
+                offset="0x00009280" />
+            <region key="REGPMRWLANBDI4" name="PMR_WLAN_BIT_DEINT4" type="peripheralBus"
+                offset="0x000092C0" />
+            <region key="REGPMRUCCQM" name="PMR_UCC_QM" type="peripheralBus"
+                offset="0x0000FC00" />
+            <region key="REGPMRTXSCP" name="PMR_TXSCP" type="peripheralBus"
+                offset="0x0006A00" />
+            <region key="REGPMRRFCTRL" name="PMR_RFCTRL" type="peripheralBus"
+                offset="0x0000C00" />
+            <region key="REGPMRRFCTRL2" name="PMR_RFCTRL2" type="peripheralBus"
+                offset="0x0000C80" />
+            <region key="REGPMRWLANCTRL" name="PMR_WLANCTRL" type="peripheralBus"
+                offset="0x0000D00" />
+            <region key="REGPMRWLANRTMFD" name="PMR_WLANRTMFD" type="peripheralBus"
+                offset="0x0002180" />
+            <region key="REGPMRWLANRTMTD" name="PMR_WLANRTMTD" type="peripheralBus"
+                offset="0x00021C0" />
+
+            <!-- Memory -->
+            <region key="MEMSYSMEM" type="memory" offset="0xB0000000" />
+            <region key="MEMGBL_DBL" type="memory" offset="0xB4000000" />
+            <region key="MEMGBL_SXT" type="memory" offset="0xB5000000" />
+            <region key="MEMGBL_CPX" type="memory" offset="0xB6000000" />
+            <region key="MEMGBL_PKD" type="memory" offset="0xB7000000" />
+        </addressRegions>
+
+        <!-- Address views and adaptors -->
+        <addressViewer>
+            <view name="host" type="systemBus" baseAddress="0xA4000000"
+                stride="4" />
+            <view name="host" type="extSystemBus"
+                  baseAddress="0xa4009000" stride="4" />
+            <view name="dcp" type="peripheralBus"
+                  baseAddress="0x00000000"
+                  stride="1" />
+            <adaptor name="host" type="peripheralBus" view="systemBus"
+                offset="0x00400000" shift="0" />
+        </addressViewer>
+
+        <!-- Ensigma DMA Controller (EDC) parameters -->
+        <dmaController>
+            <numChannels value="5"/>
+        </dmaController>
+
+        <!-- Event Flag System (EFS) parameters -->
+        <eventFlagSystem>
+            <slicedEventFlagSystem>
+                <totalNumberOfSlices value="32"/>
+                <totalNumberOfSelectors value="16"/>
+
+            </slicedEventFlagSystem>
+        </eventFlagSystem>
+
+        <!-- Queue Manager (QM) parameters -->
+        <queueManager>
+            <dynamicQueueManager>
+                <totalNumberOfQueues value="80"/>
+                <memorySizeInWords value="512"/>
+                <wordSizeInBits value="32"/>
+
+            </dynamicQueueManager>
+	 </queueManager>
+
+    </ucc>
+</uccPlatform>
