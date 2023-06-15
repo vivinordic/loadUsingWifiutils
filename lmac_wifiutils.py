@@ -7,7 +7,7 @@ class WiFiUtilsClient():
     def __init__(self, port='/dev/ttyACM1', baudrate=115200):
         self.port = port
         self.baudrate = baudrate
-        
+
     def connect(self):
         """
         Establish connection with the device
@@ -21,7 +21,7 @@ class WiFiUtilsClient():
             stopbits = serial.STOPBITS_ONE , #number of stop bits
             timeout = 0.5
         )
-        
+
         if self.ser.isOpen() :
           return 'CONNECTED'
         else :
@@ -34,14 +34,15 @@ class WiFiUtilsClient():
 
     def execute_command(self, cmd, timeout=5):
         """Send command to the device"""
-        print(cmd)
+        #print(cmd)
         #cmd = f'{cmd}\n'.encode(encoding='UTF-8')
         try:
             self.ser.write(cmd+'\n')
+            self.ser.flush()
         except Exception:
             raise
-        time.sleep(0.1)
-        
+        time.sleep(0.01)
+
     def read(self, size=1):
         """Read data from the device"""
         #self.ser.reset_input_buffer()

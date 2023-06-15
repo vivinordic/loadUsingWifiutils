@@ -1,5 +1,5 @@
 """
-HAL for automation 
+HAL for automation
 we use 3 ways of implementation now: 1. DA access; 2. wifi utils; 3. devmem
 set this param is input or in excel sheet
 
@@ -28,28 +28,34 @@ UMAC_SCR_RAM : 0x300000 - 0x338000 (57344 words)
 
 import sys
 import os
-from CSUtils import DA
+#from CSUtils import DA
 from common_utils import *
 from file_operations import *
 import lmac_def
 import lmac_wifiutils
 
 def getMemValue(addrInput):
-    #print("input address is "+str(addrInput))
+    #print("input address is "+hex(addrInput))
     #print("type of input is"+str(type(addrInput)))
     if not isinstance(addrInput, int):
         if isinstance(addrInput, long):
             addrInput=(int)(addrInput)
-        else: 
+        else:
             addrInput=(int)(addrInput, 0)
     if ((addrInput & 0xff000000) == 0xb0000000):
         addr = (addrInput & 0xffffff) | 0x0c0000 #PKTRAM
     elif ((addrInput & 0xff000000) == 0xb7000000):
         addr = (addrInput & 0xffffff) | 0x080000 #GRAM
+    elif ((addrInput & 0xff000000) == 0xb4000000):
+        addr = (addrInput & 0xffffff) | 0x080000 #GRAM
     elif ((addrInput & 0xff000000) == 0xa4000000):
         addr = (addrInput & 0xffffff) | 0x000000 #SYS bus
     elif ((addrInput & 0xff000000) == 0xa5000000):
         addr = (addrInput & 0xffffff) | 0x040000 #PERIP bus
+    elif ((addrInput & 0xfff00000) == 0x80100000):
+        addr = (addrInput & 0x0fffff) | 0x300000 #UMAC scratch Mem
+    elif ((addrInput & 0xfff00000) == 0xbfc00000):
+        addr = (addrInput & 0x0fffff) | 0x150 #MIPS_MCU_BOOT_EXCP_INSTR_0
     #print("addr on silicon is "+str(hex(addr)))
     return addr
 
@@ -100,7 +106,7 @@ def readBlock(addr, size, dataType, elementNum):
 def empty_readblk(addr, size, dataType, elementNum):
     siliconAddr= getMemValue(addr)
     from automation import silConnect
-    readbyte=silConnect.empty_read_wrd(siliconAddr)   
+    readbyte=silConnect.empty_read_wrd(siliconAddr)
 
 def writeBlock(addr, size, data, dataType):
     from automation import targetdict
@@ -109,13 +115,13 @@ def writeBlock(addr, size, data, dataType):
         if(dataType==lmac_def.DataType.TYPE_32BIT):
             DA.WriteMemoryBlock(addr, size, DUT_ElementTypes.typeUnsigned32bit, data, DUT_MemoryTypes.Default)
         if(dataType==lmac_def.DataType.TYPE_8BIT):
-            DA.WriteMemoryBlock(addr, size, DUT_ElementTypes.typeUnsigned8bit, data, DUT_MemoryTypes.Default)    
+            DA.WriteMemoryBlock(addr, size, DUT_ElementTypes.typeUnsigned8bit, data, DUT_MemoryTypes.Default)
     elif(targetdict['TargetName']=='SILICON'):
         if (targetdict['SiliconAccessType']=='DAUtils'):
             if(dataType==lmac_def.DataType.TYPE_32BIT):
                 DA.WriteMemoryBlock(addr, size, DUT_ElementTypes.typeUnsigned32bit, data, DUT_MemoryTypes.Default)
             if(dataType==lmac_def.DataType.TYPE_8BIT):
-                DA.WriteMemoryBlock(addr, size, DUT_ElementTypes.typeUnsigned8bit, data, DUT_MemoryTypes.Default) 
+                DA.WriteMemoryBlock(addr, size, DUT_ElementTypes.typeUnsigned8bit, data, DUT_MemoryTypes.Default)
         elif(targetdict['SiliconAccessType']=='WifiUtils'):
             siliconAddr= getMemValue(addr)
             writeData=0; i=0 #inilization
@@ -141,4 +147,47 @@ def writeBlock(addr, size, data, dataType):
                         siliconAddr+=4; tempSize-=4; #decrease tempSize by 4 bytes, used in the loop
                         writeData=0; i=0 #final reset for next word
                         #print("after the write" +str(writeData))
-    
+
+def writeBlockNew(silConnect, addr, size, data, dataType):
+    siliconAddr= getMemValue(addr)
+    writeData=0; i=0 #inilization
+    #from automation_phy import silConnect
+    if (size==1):
+        silConnect.write_wrd(siliconAddr, data)
+    elif(size>1):
+        tempSize=size
+        for x in data:
+            if (dataType==lmac_def.DataType.TYPE_32BIT):
+                silConnect.write_wrd(siliconAddr, x)
+                siliconAddr+=4
+            if(dataType==lmac_def.DataType.TYPE_8BIT):
+                if(i<3):
+                    writeData+=x<<(i*8); i+=1 #increment i by 1
+                    print("in if loop write data is"+str(hex(writeData)))
+                    if tempSize!= i:
+                        continue
+                elif (tempSize > i):
+                    writeData+=x<<(i*8) #here i=3
+                print("wirte data is "+str(hex(writeData)))
+                silConnect.write_wrd(siliconAddr, writeData)
+                siliconAddr+=4; tempSize-=4; #decrease tempSize by 4 bytes, used in the loop
+                writeData=0; i=0 #final reset for next word
+                #print("after the write" +str(writeData))
+
+def writeZeroBlock(silConnect, addr, sectionSize, dataType):
+    siliconAddr= getMemValue(addr)
+    writeData=0; i=0 #inilization
+    #from automation_phy import silConnect
+    if (sectionSize==1):
+        silConnect.write_wrd(siliconAddr, 0)
+    elif(sectionSize>1):
+        offset = 0
+        # Write no more than 1kB to memory in a single transaction (slow targets
+        # might time out).
+        sliceSize = 256
+        if (dataType==lmac_def.DataType.TYPE_32BIT):
+            while (sectionSize > sliceSize):
+                silConnect.write_blk(siliconAddr + offset, 0x00, 0, sliceSize)
+                offset += sliceSize * 4 # byte address
+                sectionSize -= sliceSize
+            silConnect.write_blk(siliconAddr + offset, 0x00, 0, sectionSize)
