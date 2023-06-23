@@ -197,6 +197,7 @@ def main():
 
         commandNum = binaryStringToInt(f.read(2), size=2)
         if commandNum == 1:
+            print(1)
             # If registers poke
             output.append(("Register Poke:", "pokeAddress:", str(binaryStringToHexString(address)),
                            "pokeValue:", str(binaryStringToHexString(sectionSizeStr))))
@@ -204,6 +205,7 @@ def main():
             RECORDS.append(Record(commandNum, int(binaryStringToHexString(address), 16),
                                   int(binaryStringToHexString(sectionSizeStr), 16), None))
         elif commandNum == 0:
+            print(0)
             # If data load
             output.append(("Data Load:", "Section Address:", str(binaryStringToHexString(address)),
                            "Section Size:", str(binaryStringToHexString(sectionSizeStr))))
@@ -220,6 +222,7 @@ def main():
             #print "{0:<19} {1:<16} {2:<10} {3:<13} {4:<10}".format(*output[-1])
             #print RANGES
         elif commandNum == 2:
+            print(2)
             # If MCP code load
             # This section size comes in first 24bits of the command argument. Last 4 bits are reserved for the MCP id.
             mcpBitMask = (sectionSize >> 24) & 0xff
@@ -239,6 +242,7 @@ def main():
             #print "{0:<19} {1:<16} {2:<10} {3:<13} {4:<10}".format(*output[-1])
             #print RANGES
         elif commandNum == 4:
+            print(4)
             # If zero memory
             offset += 2 * 2
             f.seek(offset)
@@ -252,6 +256,7 @@ def main():
             localZeroRecords.append(zeroRecord)
 
         elif commandNum == 5:
+            print(5)
             # If retained data load
             output.append(("Retained Data Load:", "Section Address:", str(binaryStringToHexString(address)),
                            "Section Size:", str(binaryStringToHexString(sectionSizeStr))))
@@ -265,11 +270,13 @@ def main():
             #print "{0:<19} {1:<16} {2:<10} {3:<13} {4:<10}".format(*output[-1])
             #print RANGES
         if commandNum == 6:
+            print(6)
             # If cold boot poke
             output.append(("Cold Boot Poke:", "pokeAddress:", str(binaryStringToHexString(address)),
                            "pokeValue:", str(binaryStringToHexString(sectionSizeStr))))
             offset += 4
         elif commandNum == 7:
+            print(7)
             # if retained zero memory
             offset += 2 * 2
             f.seek(offset)
@@ -295,19 +302,20 @@ def main():
     if ifPrint:
         for line in output:
             fo.write("###########################################################\n")
-            print "{0:<19} {1:<16} {2:<10} {3:<13} {4:<10}".format(*line)
+            #print "{0:<19} {1:<16} {2:<10} {3:<13} {4:<10}".format(*line)
             fo.write("{0:<19} {1:<16} {2:<10} {3:<13} {4:<10}\n".format(*line))
             fo.write("###########################################################\n")
 ##            print RECORDS[ii].command
             print hex(RECORDS[ii].destination)
             fo.write(hex(RECORDS[ii].destination)+'\n')
-            print hex(getMemValue(RECORDS[ii].destination))
+            #print hex(getMemValue(RECORDS[ii].destination))
             fo.write(hex(getMemValue(RECORDS[ii].destination))+'\n')
             fo.write(hex(RECORDS[ii].size)+'\n')
+            print hex(RECORDS[ii].size)
             fo.write("***********\n")
             if RECORDS[ii].payload:
                 if (RECORDS[ii].payload[0] != '\x00'):
-                    print hex(RECORDS[ii].payload[0])
+                    #print hex(RECORDS[ii].payload[0])
                     for jj in range(len(RECORDS[ii].payload)):
                         fo.write('%08X\n' %RECORDS[ii].payload[jj])
 
@@ -318,7 +326,7 @@ def main():
 
 if __name__ == '__main__':
 
-    outFile =  "txscp_output_real.txt"
+    outFile =  "txscp_output_real_x.txt"
     fo = open(outFile, "w")
 
 ##    for index in range(0,samples2Read):

@@ -23,6 +23,7 @@ import lmac_wifiutils
 import struct
 import hal
 import lmac_def
+import evaluate_variable as ev
 
 from ctypes import *
 ######################################
@@ -37,9 +38,8 @@ MCP_LOAD_TYPE_PRELOAD = 4
 
 LOAD_INFO = {
     # A list of elfs to load
-    "elfs": {
-        1 : "HARNESS.elf"
-    },
+    "elfs": "release_MIPSGCC/HARNESS.elf"
+    ,
     "shared": {
 
     },
@@ -159,10 +159,13 @@ def LoadBimgFiles(probe=None):
                     sectionSize = BinaryStringToIntLE(f.read(headerFiledSize32))
                     offset += headerFiledSize32
                     address = BinaryStringToIntLE(f.read(addressLength))
+                    print(hex(address), hex(sectionSize))
 
                     offset += headerFiledSize32
                     commandOption = BinaryStringToIntLE(f.read(headerFiledSize16), size=2)
                     if commandOption in [1, 6]:
+                        #print(1)
+                        #print(address)
                         # If registers poke
                         pokeValue = sectionSize
                         #memory.Write(address, pokeValue)
@@ -170,6 +173,8 @@ def LoadBimgFiles(probe=None):
                         offset += headerFiledSize32
 
                     elif commandOption in [0, 5]:
+                        #print(0)
+                        #print(address)
                         # If data load
                         offset += 2 * headerFiledSize16
                         f.seek(offset)
@@ -178,28 +183,46 @@ def LoadBimgFiles(probe=None):
                         sliceSize = LOAD_INFO["loadSliceSize"]
                         while (sectionSize > sliceSize):
                             #memory.Write(address, BinaryStringToIntList(f, offset, sliceSize))
-                            intList = BinaryStringToIntList(f, offset, sliceSize)
+                            inList = BinaryStringToIntList(f, offset, sliceSize)
+                            if ((address & 0xff000000) == 0XB4000000):
+                                intList =[]
+                                for x in range(len(inList)/4):
+                                    intList.append(((0xff00 & inList[4*x+1])<<16)+(inList[4*x]>>8))
+                                    intList.append(((0xffff00 & inList[4*x+2])<<8)+(inList[4*x+1]>>16))
+                                    intList.append((0xffffff00 & inList[4*x+3])+(inList[4*x+2]>>24))
+                            else:
+                                intList = inList
                             hal.writeBlockNew(silConnect, address, len(intList), intList, lmac_def.DataType.TYPE_32BIT)
-                            address += sliceSize
+                            if ((address & 0xff000000) == 0XB4000000):
+                                address += len(intList)*4
+                            else:
+                                address += sliceSize
                             offset += sliceSize
                             sectionSize -= sliceSize
                         #memory.Write(address, BinaryStringToIntList(f, offset, sectionSize))
-                        intList = BinaryStringToIntList(f, offset, sectionSize)
-##                        if ((address & 0xfff00000) == 0xbfc00000):
-##                            print(hex(address))
-##                            for xx in intList:
-##                                print(hex(xx))
-##                        else:
+                        inList = BinaryStringToIntList(f, offset, sectionSize)
+                        if ((address & 0xff000000) == 0XB4000000):
+                            intList =[]
+                            for x in range(len(inList)/4):
+                                intList.append(((0xff00 & inList[4*x+1])<<16)+(inList[4*x]>>8))
+                                intList.append(((0xffff00 & inList[4*x+2])<<8)+(inList[4*x+1]>>16))
+                                intList.append((0xffffff00 & inList[4*x+3])+(inList[4*x+2]>>24))
+                        else:
+                            intList = inList
+                        #if(address !=0xbfc00000):
                         hal.writeBlockNew(silConnect, address, len(intList), intList, lmac_def.DataType.TYPE_32BIT)
                         offset += sectionSize
 
                     elif commandOption in [4, 7]:
+                        #print(4)
+                        #print(address)
                         # If zero memory
                         offset += 2 * headerFiledSize16
                         f.seek(offset)
                         if not LOAD_INFO['preZeroMem']:
                           #memory.Write(address, GenerateZeroList(sectionSize), 1)
                           hal.writeZeroBlock(silConnect, address, sectionSize/4, lmac_def.DataType.TYPE_32BIT)
+                          pass
 
                     elif commandOption == 2:
                         # If MCP code load
@@ -312,7 +335,18 @@ def main():
     silConnect.wifi_on()
     #silConnect.execute_command('wifiutils write_wrd 0x0100 0x0')
     LoadBimgFiles()
-    #silConnect.execute_command('wifiutils write_wrd 0x0100 0x1')
+##    silConnect.execute_command('wifiutils write_wrd 0x0100 0x1')
+    silConnect.execute_command('wifiutils write_wrd 0x0100 0x1')
+    a = raw_input('changing power to 12')
+    address = ev.evaluateSymbol('&tx_params.txpower',LOAD_INFO["elfs"])
+    hal.writeBlockNew(silConnect, address, 1, 12, lmac_def.DataType.TYPE_32BIT)
+    address = ev.evaluateSymbol('&TEST_PARAMS.TX_PARAMS_UPDATION',LOAD_INFO["elfs"])
+    hal.writeBlockNew(silConnect, address, 1, 1, lmac_def.DataType.TYPE_32BIT)
+    b = raw_input('changing psdu legth to 2048')
+    address = ev.evaluateSymbol('&tx_params.psdu_length',LOAD_INFO["elfs"])
+    hal.writeBlockNew(silConnect, address, 1, 2048, lmac_def.DataType.TYPE_32BIT)
+    address = ev.evaluateSymbol('&TEST_PARAMS.TX_PARAMS_UPDATION',LOAD_INFO["elfs"])
+    hal.writeBlockNew(silConnect, address, 1, 1, lmac_def.DataType.TYPE_32BIT)
 ##    with open('lmac_bringup.txt') as f:
 ##        lines = f.readlines()
 ##    for line in lines:
