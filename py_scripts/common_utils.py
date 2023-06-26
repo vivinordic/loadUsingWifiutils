@@ -261,6 +261,7 @@ class TargetParams(object):
     target              = ''
     build_config        = ''
     target_selection    = ''
+    silConnect          = ''
 
     def __init__(self):
         self.target_type         = ''
@@ -269,6 +270,7 @@ class TargetParams(object):
         self.target              = ''
         self.build_config        = ''
         self.target_selection    = ''
+        self.silConnect          = ''
 
     def updateParams(self,configDict):
         self.target_type         = configDict['target_type']
@@ -703,16 +705,18 @@ class RxVector (object):
 # Class Object Instatiantions:
 ##DUT_OperatingModes   = DUT_OPERATION_MODE()
 ##DUT_test_states      = TEST_STATE()
-DUT_MemoryTypes      = MemoryTypes()
-DUT_ElementTypes     = ElementTypes()
+DUT_MemoryTypes       = MemoryTypes()
+DUT_ElementTypes      = ElementTypes()
 ##DUT_BreakPointTypes  = BreakPointType()
 ##DUT_HardResetEnable  = HardResetEnable()
 ##DUT_BreakPointEnable = BreakPointEnable()
-DUT_FreqBand         = FreqBand()
-DUT_HarnessEnable    = HarnessEnable()
+DUT_FreqBand          = FreqBand()
+DUT_HarnessEnable     = HarnessEnable()
 ##DUT_LoadTypes        = LoadTypes()
 DUT_FrameFormat       = FrameFormat()
 DUT_CBW               = ChBandWidth()
+testConfigParams      = TestConfigParams()
+targetParams          = TargetParams()
 ##simparams_variables  = SIMPARAMS_VARIABLE()
 ###############################################
 

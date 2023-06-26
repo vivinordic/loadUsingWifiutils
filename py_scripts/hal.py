@@ -58,29 +58,12 @@ def getMemValue(addrInput):
     #print("addr on silicon is "+str(hex(addr)))
     return addr
 
-def readBlock(addr, size, dataType, elementNum):
-    from automation import targetdict
-    #print(targetdict['TargetName'])
+def readBlock(addr, size, dataType):
     readList=[]
     siliconAddr= getMemValue(addr)
     print("the address on silicon is "+str(hex(siliconAddr)))
-    from automation import silConnect
     if(dataType==DUT_ElementTypes.typeUnsigned32bit):
-        if (isinstance(elementNum, int)):
-            #print("extracting single byte" )
-            elementNum*=4
-            siliconAddr+=elementNum
-            #print(hex(siliconAddr)+" is type " + str(type(siliconAddr)))
-            readbyte=silConnect.read_wrd(siliconAddr)
-            #print("read byte is "+str(readbyte))
-            return readbyte
-        else:
-            for i in range(0,55):
-                readList.append(silConnect.read_wrd(siliconAddr))
-                print(readList[i])
-                siliconAddr+=4
-            return readList
-        #print("null")
+        silConnect.read_blk(siliconAddr,size)
 
 def empty_readblk(addr, size, dataType, elementNum):
     siliconAddr= getMemValue(addr)
@@ -117,25 +100,21 @@ def writeBlock(addr, size, data, dataType):
 
 def writeBlockNew(silConnect, addr, size, data, dataType):
     siliconAddr= getMemValue(addr)
-    writeData=0; i=0 #inilization
-    #from automation_phy import silConnect
-    if (size==1):
+    if (size == 1):
         silConnect.write_wrd(siliconAddr, data)
     elif(size>1):
-        tempSize=size
-        for x in data:
-            if (dataType==DUT_ElementTypes.typeUnsigned32bit):
-##                silConnect.write_wrd(siliconAddr, x)
-##                siliconAddr+=4
-                size = 1
-                for x in range(len(a)-1):
-                    if (a[x+1] == data):
-                        size += 1
-                    else:
-                        print(hex(address),data,size)
-                        address += size * 4
-                        data = a[x+1]
-                        size = 1
+        writeData=data[0]
+        if (dataType==DUT_ElementTypes.typeUnsigned32bit):
+            clumpSize = 1
+            for x in range(size-1):
+                if (data[x+1] == writeData):
+                    clumpSize += 1
+                else:
+                    silConnect.write_blk(siliconAddr, writeData, 0, clumpSize)
+                    siliconAddr += clumpSize * 4
+                    writeData = data[x+1]
+                    clumpSize = 1
+            silConnect.write_blk(siliconAddr, writeData, 0, clumpSize)
 
 def writeZeroBlock(silConnect, addr, sectionSize, dataType):
     siliconAddr= getMemValue(addr)

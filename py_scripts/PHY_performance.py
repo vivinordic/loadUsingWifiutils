@@ -56,8 +56,6 @@ def main(targetType,
     test_config_str = 'Using ' + test_config_xlsx + ' as input config file.'
 
     # Instantiate the TestConfigParams object
-    targetParams = TargetParams()
-    testConfigParams = TestConfigParams()
     revParams = RevParams()
 
     # Read the test configuration from "WLANPHY.TestConfig.xlsx" excel sheet and update target and
@@ -109,18 +107,16 @@ def main(targetType,
 
     # load application on target and run
     target_functions.loadnRunTarget(testConfigParams.test_mode, targetParams, DUT_HarnessEnable.PhyEnable, targetParams.target_type)
-    exit(0)
 
     # check if DUT is ready to process the input
     DUT_functions.pollSystemReady()
+    exit(0)
     DUT_functions.setOperatingMode(testConfigParams.dut_operating_mode)
 
     if testConfigParams.dut_operating_mode == 'RX':
-        DUT_functions.configDigVdd(0x3B) # config digital vdd for c0 board.
         # Function call corresponding to operating mode RX
         test_mode_functions.executeOperatingMode_RX(testConfigParams, targetParams, revParams, cfgParamFromXls)
     elif testConfigParams.dut_operating_mode == 'TX':
-        DUT_functions.configDigVdd(0x3B) # config digital vdd for c0 board.
         # Function call corresponding to operating mode TX
         test_mode_functions.executeOperatingMode_TX(testConfigParams, targetParams, revParams, cfgParamFromXls)
     elif testConfigParams.dut_operating_mode == 'LOOP_BACK':

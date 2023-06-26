@@ -76,7 +76,7 @@ class WiFiUtilsClient():
         self.execute_command(txt)
         #rx = self.read().strip().decode("Ascii").split("\r\n")[-3]
         rx = self.read().decode().split("\r\n")[-3]
-        #print(rx)
+        print(rx)
         return rx
 
 

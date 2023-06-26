@@ -20,7 +20,7 @@ import target_functions_QSPI as tfQSPI
 def loadnRunTarget(test_mode ,targetParams, selectPhyorMacControl, target_type):
     print(target_type)
     if (target_type == 'QSPI'):
-        tfQSPI.loadnRunTarget(test_mode ,targetParams, selectPhyorMacControl)
+        tfQSPI.loadnRunTarget(test_mode, selectPhyorMacControl)
     else:
         tfcs.loadnRunTarget(test_mode ,targetParams, selectPhyorMacControl)
 

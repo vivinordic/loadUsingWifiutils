@@ -19,13 +19,15 @@ from common_utils import *
 #############################################
 
 
-def loadnRunTarget(test_mode ,targetParams, selectPhyorMacControl):
+def loadnRunTarget(test_mode, selectPhyorMacControl):
     """ Load HARNESS script to the target and run"""
     print("running using the wifiutils")
-    silConnect=lmac_wifiutils.WiFiUtilsClient(port=targetParams.target_number)
-    status=silConnect.connect()
+    #silConnect=lmac_wifiutils.WiFiUtilsClient(port=targetParams.target_number)
+    status=targetParams.silConnect.connect()
     print(status)
-    LoadBimgFiles(silConnect)
+    silConnect.wifi_off()
+    silConnect.wifi_on()
+    LoadBimgFiles()
     runTarget(silConnect)
 
 def BinaryStringToIntLE(binString, size=4):
@@ -52,7 +54,7 @@ def BinaryStringToIntList(stream, offset, size):
         intList.append(BinaryStringToIntLE(binString))
     return intList
 
-def LoadBimgFiles(silConnect):
+def LoadBimgFiles():
     '''Load Bimg files'''
     filenames = ["../harness/loader/build/smake/release_MIPSGCC/HARNESS.bimg"]
     headerFiledSize32 = 4
@@ -60,6 +62,7 @@ def LoadBimgFiles(silConnect):
     headerSizeOffset = 28
     addressLength = 4
     ERRORS = []
+    silConnect = targetParams.silConnect
 
 
     try:
