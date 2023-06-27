@@ -4,6 +4,7 @@ from common_utils import *
 #from CSUtils import DA
 import DUT_functions
 from math import log
+import memory_read_write as DA
 
 #from iqxel import *
 totalPktCount = 1000
@@ -16,8 +17,8 @@ class Harness_SSH:
         global se
         global stats_path
         print(target)
-        DA.UseTarget(target)
-        target_info = DA.GetTargetInfo()
+##        DA.UseTarget(target)
+##        target_info = DA.GetTargetInfo()
 
     #Set Streams
     def set_dut_streams(self,streams='1x1',test='rx'):

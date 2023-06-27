@@ -15,24 +15,25 @@ import evaluate_variable as EV
 import hal
 
 def EvaluateSymbol(name):
-    if (targetParams.target_type == QSPI):
-        address = EV.EvaluateSymbol(name)
+    if (targetParams.target_type == 'QSPI'):
+        elf = "../harness/loader/build/smake/release_MIPSGCC/HARNESS.elf"
+        address = EV.EvaluateSymbol(name, elf)
     else:
         address = DA.EvaluateSymbol(name)
-    pass
+    return address
 
 
 def WriteMemoryBlock(mtp_address, size, elementType, value, memoryType):
-    if (targetParams.target_type == QSPI):
-        hal.writeBlockNew(targetParams.target, addr, size, value, dataType)
+    if (targetParams.target_type == 'QSPI'):
+        hal.writeBlockNew(targetParams.silConnect, mtp_address, size, value, elementType)
     else:
         DA.WriteMemoryBlock(mtp_address, size, elementType, value, memoryType)
     pass
 
 
 def ReadMemoryBlock(mtp_address, size, elementType, memoryType):
-    if (targetParams.target_type == QSPI):
-        hal.readBlock(targetParams.target, addr, size, data, dataType)
+    if (targetParams.target_type == 'QSPI'):
+        value = hal.readBlock(targetParams.silConnect, mtp_address, size, elementType)
     else:
-        value = ReadMemoryBlock(mtp_address, size, elementType, memoryType)
+        value = DA.ReadMemoryBlock(mtp_address, size, elementType, memoryType)
     return value

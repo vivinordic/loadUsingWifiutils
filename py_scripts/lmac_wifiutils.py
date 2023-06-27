@@ -63,6 +63,7 @@ class WiFiUtilsClient():
 
     def read_wrd(self,addr):
         txt="wifiutils read_wrd {}".format(hex(addr))
+        self.execute_command('\n')
         self.execute_command(txt)
         #rx = self.read().strip().decode("Ascii").split("\r\n")[-3]
         rx = self.read().decode().split("\r\n")[-3]
@@ -90,11 +91,16 @@ class WiFiUtilsClient():
 
     def read_blk(self,addr,wrd_len):
         txt="wifiutils read_blk  {} {}".format(addr, wrd_len)
+        self.execute_command('\n')
         self.execute_command(txt)
         lines = int(wrd_len/4)
         num_lines = lines if ((wrd_len%4) == 0) else lines+1
         rx = self.read().decode().split("\r\n")[-(num_lines+1):-1]
-        print("\n".join(rx))
+        #print("\n".join(rx))
+        value = []
+        for x in rx:
+            value.append(int(x,16))
+        return value
 
     def wifi_on(self):
         txt="wifiutils wifi_on"

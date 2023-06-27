@@ -110,7 +110,6 @@ def main(targetType,
 
     # check if DUT is ready to process the input
     DUT_functions.pollSystemReady()
-    exit(0)
     DUT_functions.setOperatingMode(testConfigParams.dut_operating_mode)
 
     if testConfigParams.dut_operating_mode == 'RX':

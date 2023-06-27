@@ -279,6 +279,11 @@ class TargetParams(object):
         self.target              = configDict['target']
         self.build_config        = configDict['build_config']
         self.target_selection    = configDict['target_selection']
+        if (self.target_type == 'QSPI'):
+            import lmac_wifiutils
+            self.silConnect      = lmac_wifiutils.WiFiUtilsClient(port=targetParams.target_number)
+            status=self.silConnect.connect()
+            print(status)
 
 class EquipmentParams(object):
     """ This class contains all equipment related parameters"""

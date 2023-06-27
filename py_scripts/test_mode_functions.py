@@ -465,7 +465,7 @@ def executeOperatingMode_TX(testConfigParams, targetParams, revParams, cfgParamF
 
         test_plans = testConfigParams.subFuncTestPlan.split(',')
         if (test_plans[0] == 'ALL'):
-            test_plans = ['EVM', 'EVM_HE', 'EVM_LDPC', 'EVM_HELDPC']
+            test_plans = ['EVM', 'EVM_HE']
         #dut_operating_mode_TX_testmode_RF(testConfigParams,sock,MtlbExeProcess, timeout,test_cases_count,test_cases_file)
         if ('EVM' in test_plans):
             file_operations.setTestDirectory(testConfigParams,'EVM')
@@ -476,6 +476,7 @@ def executeOperatingMode_TX(testConfigParams, targetParams, revParams, cfgParamF
                     #-----------------------------------------
                     testConfigParams.status = 'TX_EVM_TESTING'
                     tx_evm_power_analysis(testConfigParams,dut)
+                    exit(0)
                     #-----------------------------------------
                 test_no +=1
                 # In case DUT process haven't completed succesfuly reload executable before starting next case

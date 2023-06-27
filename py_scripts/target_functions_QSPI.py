@@ -23,12 +23,10 @@ def loadnRunTarget(test_mode, selectPhyorMacControl):
     """ Load HARNESS script to the target and run"""
     print("running using the wifiutils")
     #silConnect=lmac_wifiutils.WiFiUtilsClient(port=targetParams.target_number)
-    status=targetParams.silConnect.connect()
-    print(status)
-    silConnect.wifi_off()
-    silConnect.wifi_on()
+    targetParams.silConnect.wifi_off()
+    targetParams.silConnect.wifi_on()
     LoadBimgFiles()
-    runTarget(silConnect)
+    runTarget(targetParams.silConnect)
 
 def BinaryStringToIntLE(binString, size=4):
     '''Convert binary string to little endian integer'''

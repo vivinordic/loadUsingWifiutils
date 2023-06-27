@@ -58,12 +58,23 @@ def getMemValue(addrInput):
     #print("addr on silicon is "+str(hex(addr)))
     return addr
 
-def readBlock(addr, size, dataType):
+def readBlock(silConnect, addr, size, dataType):
     readList=[]
     siliconAddr= getMemValue(addr)
-    print("the address on silicon is "+str(hex(siliconAddr)))
+    #print("the address on silicon is "+str(hex(siliconAddr)))
     if(dataType==DUT_ElementTypes.typeUnsigned32bit):
-        silConnect.read_blk(siliconAddr,size)
+        value = silConnect.read_blk(siliconAddr,size)
+    elif(dataType==DUT_ElementTypes.typeUnsigned8bit):
+        tempAddr  = (siliconAddr>>2)<<2
+        offset    = siliconAddr % 4
+        tempValue = silConnect.read_blk(tempAddr,size)[0]
+        value     = [(tempValue >> ((offset)*8)) & 0xff]
+    elif(dataType==DUT_ElementTypes.typeUnsigned16bit):
+        tempAddr  = (siliconAddr>>2)<<2
+        offset    = siliconAddr % 4
+        tempValue = silConnect.read_blk(tempAddr,size)[0]
+        value     = [(tempValue >> ((offset)*8)) & 0xffff]
+    return value
 
 def empty_readblk(addr, size, dataType, elementNum):
     siliconAddr= getMemValue(addr)
@@ -101,7 +112,21 @@ def writeBlock(addr, size, data, dataType):
 def writeBlockNew(silConnect, addr, size, data, dataType):
     siliconAddr= getMemValue(addr)
     if (size == 1):
-        silConnect.write_wrd(siliconAddr, data)
+        if (dataType==DUT_ElementTypes.typeUnsigned32bit):
+            silConnect.write_wrd(siliconAddr, data)
+        elif (dataType==DUT_ElementTypes.typeUnsigned8bit):
+            readValue = readBlock(silConnect, addr, size, dataType)[0]
+            tempAddr  = (siliconAddr>>2)<<2
+            offset    = siliconAddr % 4
+            if (offset == 0):
+                writeValue = (readValue & 0xffffff00)| data
+            elif (offset == 1):
+                writeValue = (readValue & 0xffff00ff)| (data << 8)
+            elif (offset == 2):
+                writeValue = (readValue & 0xff00ffff)| (data <<16)
+            elif (offset == 3):
+                writeValue = (readValue & 0x00ffffff)| (data <<24)
+            silConnect.write_wrd(tempAddr, writeValue)
     elif(size>1):
         writeData=data[0]
         if (dataType==DUT_ElementTypes.typeUnsigned32bit):

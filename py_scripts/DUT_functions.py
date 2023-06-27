@@ -15,6 +15,7 @@ import math
 
 #from imgtec.console import *
 #from CSUtils import DA
+import memory_read_write as DA
 from common_utils import *
 from rxvector_utils import *
 #############################################
@@ -484,6 +485,7 @@ def clearTestDoneIndication():
 def pollSystemReady():
     """" Check whether Harness has reached master wait """
     valuePtr = DA.EvaluateSymbol('&HARNESS_OUTPUT.dut_ready')
+    print(valuePtr)
     dutReady = DA.ReadMemoryBlock(valuePtr, 1, DUT_ElementTypes.typeUnsigned8bit, DUT_MemoryTypes.Default)[0]
 
     while(dutReady==0):
